@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using JwtUtils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;

@@ -1,12 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 
-namespace JwtIssuer
+namespace JwtUtils
 {
     public class JWTTokenOptions
     {

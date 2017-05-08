@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JwtUtils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ namespace JwtAudience
 {
     public class Startup
     {
+        private JWTTokenOptions _tokenOptions = new JWTTokenOptions();
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
