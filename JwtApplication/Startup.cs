@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.IdentityModel.Tokens;
 
-namespace JwtApplication
+namespace JwtIssuer
 {
     public class Startup
     {
+        private JWTTokenOptions tokenOptions = new JWTTokenOptions();
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -29,6 +30,18 @@ namespace JwtApplication
         {
             // Add framework services.
             services.AddMvc();
+            services.AddDbContext<AuthDbContext>(builder =>
+            {
+                builder.UseSqlite("Filename=./jwt.db");
+            });
+            string keyDir = PlatformServices.Default.Application.ApplicationBasePath;
+            if (RSAUtils.TryGetKeyParameters(keyDir, out RSAParameters keyParams) == false)
+            {
+                keyParams = RSAUtils.GenerateAndSaveKey(keyDir);
+            }
+            tokenOptions.Key = new RsaSecurityKey(keyParams);
+            tokenOptions.Credentials = new SigningCredentials(tokenOptions.Key, SecurityAlgorithms.RsaSha256Signature);
+            services.AddSingleton(tokenOptions);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

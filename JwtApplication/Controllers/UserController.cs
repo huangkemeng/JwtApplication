@@ -4,12 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JwtApplication.Controllers
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace JwtIssuer.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class UserController : Controller
     {
-        // GET api/values
+        private readonly AuthDbContext _dbContext;
+
+        public UserController(AuthDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+        // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
@@ -23,10 +31,12 @@ namespace JwtApplication.Controllers
             return "value";
         }
 
-        // POST api/values
+        // POST api/user
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody]User newUser)
         {
+            _dbContext.Users.Add(newUser);
+            _dbContext.SaveChanges();
         }
 
         // PUT api/values/5
