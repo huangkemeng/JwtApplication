@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Principal;
 using JwtUtils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Zeeko.UtilsPack;
 
 namespace JwtIssuer.Controllers
 {
@@ -33,13 +32,16 @@ namespace JwtIssuer.Controllers
         private string CreateToken(User user, DateTime expire, string audience)
         {
             var handler = new JwtSecurityTokenHandler();
+            string jti = audience + user.Username + expire.GetMilliseconds();
+            jti = jti.GetMd5();
             var claims = new[]
             {
                 new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.Integer32)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.Integer32),
+                new Claim("jti",jti,ClaimValueTypes.String)
             };
             ClaimsIdentity identity = new ClaimsIdentity(new GenericIdentity(user.Username, "TokenAuth"), claims);
-            var token = handler.CreateEncodedJwt(new SecurityTokenDescriptor()
+            var token = handler.CreateEncodedJwt(new SecurityTokenDescriptor
             {
                 Issuer = "TestIssuer",
                 Audience = audience,
@@ -59,7 +61,7 @@ namespace JwtIssuer.Controllers
 
         // POST api/token/audience
         [HttpPost("{audience}")]
-        public IActionResult Post([FromBody]User user, [FromQuery] string audience)
+        public IActionResult Post([FromBody]User user, string audience)
         {
             DateTime expire = DateTime.Now.AddDays(7);
 
@@ -68,7 +70,7 @@ namespace JwtIssuer.Controllers
             {
                 return Json(new { Error = "用户名或密码错误" });
             }
-            return Json(new {Token = CreateToken(result, expire, "TestAudience")});
+            return Json(new { Token = CreateToken(result, expire, audience) });
         }
 
         // PUT api/values/5

@@ -10,13 +10,15 @@ namespace JwtUtils
         /// 从本地文件中读取用来签发 Token 的 RSA Key
         /// </summary>
         /// <param name="filePath">存放密钥的文件夹路径</param>
+        /// <param name="withPrivate"></param>
         /// <param name="keyParameters"></param>
         /// <returns></returns>
-        public static bool TryGetKeyParameters(string filePath, out RSAParameters keyParameters)
+        public static bool TryGetKeyParameters(string filePath, bool withPrivate, out RSAParameters keyParameters)
         {
+            string filename = withPrivate ? "key.json" : "key.public.json";
             keyParameters = default(RSAParameters);
-            if (File.Exists(filePath) == false) return false;
-            keyParameters = JsonConvert.DeserializeObject<RSAParameters>(File.ReadAllText(Path.Combine(filePath, "key.json")));
+            if (Directory.Exists(filePath) == false) return false;
+            keyParameters = JsonConvert.DeserializeObject<RSAParameters>(File.ReadAllText(Path.Combine(filePath, filename)));
             return true;
         }
 

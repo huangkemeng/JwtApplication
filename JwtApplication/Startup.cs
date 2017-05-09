@@ -36,7 +36,7 @@ namespace JwtIssuer
                 builder.UseSqlite("Filename=./jwt.db");
             });
             string keyDir = PlatformServices.Default.Application.ApplicationBasePath;
-            if (RSAUtils.TryGetKeyParameters(keyDir, out RSAParameters keyParams) == false)
+            if (RSAUtils.TryGetKeyParameters(keyDir, true, out RSAParameters keyParams) == false)
             {
                 keyParams = RSAUtils.GenerateAndSaveKey(keyDir);
             }
