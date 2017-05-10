@@ -3,32 +3,28 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using JwtIssuer;
+using JwtAudience;
 
-namespace JwtIssuer.Migrations
+namespace JwtAudience.Migrations
 {
-    [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AudienceDbContext))]
+    partial class AudienceDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2");
 
-            modelBuilder.Entity("JwtIssuer.User", b =>
+            modelBuilder.Entity("JwtAudience.BlackRecord", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<string>("Jti")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Password");
+                    b.Property<string>("UserId");
 
-                    b.Property<string>("Role");
+                    b.HasKey("Jti");
 
-                    b.Property<string>("Username");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
+                    b.ToTable("BlackRecords");
                 });
         }
     }

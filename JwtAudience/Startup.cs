@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
 using JwtUtils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,7 +15,7 @@ namespace JwtAudience
 {
     public class Startup
     {
-        private JWTTokenOptions _tokenOptions = new JWTTokenOptions();
+        private readonly JWTTokenOptions _tokenOptions = new JWTTokenOptions();
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -34,6 +31,10 @@ namespace JwtAudience
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AudienceDbContext>(builder =>
+            {
+                builder.UseSqlite("Filename=./audience.db");
+            });
             string keyDir = PlatformServices.Default.Application.ApplicationBasePath;
             if (RSAUtils.TryGetKeyParameters(keyDir, false, out RSAParameters keyparams) == false)
             {
@@ -48,11 +49,14 @@ namespace JwtAudience
             _tokenOptions.Credentials = new SigningCredentials(_tokenOptions.Key, SecurityAlgorithms.RsaSha256Signature);
             services.AddSingleton(_tokenOptions);
 
+            services.AddSingleton<IAuthorizationHandler, ValidJtiHandler>();
+
             services.AddAuthorization(auth =>
             {
                 auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
                     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
+                    .AddRequirements(new ValidJtiRequirement())
                     .Build());
             });
             // Add framework services.

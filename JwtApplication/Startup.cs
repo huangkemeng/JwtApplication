@@ -1,5 +1,7 @@
 ﻿using System.Security.Cryptography;
 using JwtUtils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +15,7 @@ namespace JwtIssuer
 {
     public class Startup
     {
-        private JWTTokenOptions tokenOptions = new JWTTokenOptions();
+        private readonly JWTTokenOptions _tokenOptions = new JWTTokenOptions();
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -30,7 +32,6 @@ namespace JwtIssuer
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
             services.AddDbContext<AuthDbContext>(builder =>
             {
                 builder.UseSqlite("Filename=./jwt.db");
@@ -40,9 +41,18 @@ namespace JwtIssuer
             {
                 keyParams = RSAUtils.GenerateAndSaveKey(keyDir);
             }
-            tokenOptions.Key = new RsaSecurityKey(keyParams);
-            tokenOptions.Credentials = new SigningCredentials(tokenOptions.Key, SecurityAlgorithms.RsaSha256Signature);
-            services.AddSingleton(tokenOptions);
+            _tokenOptions.Key = new RsaSecurityKey(keyParams);
+            _tokenOptions.Issuer = "TestIssuer";
+            _tokenOptions.Credentials = new SigningCredentials(_tokenOptions.Key, SecurityAlgorithms.RsaSha256Signature);
+            services.AddSingleton(_tokenOptions);
+            services.AddAuthorization(auth =>
+            {
+                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build());
+            });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +61,17 @@ namespace JwtIssuer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseJwtBearerAuthentication(new JwtBearerOptions
+            {
+                TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = _tokenOptions.Key,
+                    ValidIssuer = _tokenOptions.Issuer,
+                    ValidateLifetime = true,
+                    ValidateAudience = false
+                }
+               
+            });
             app.UseMvc();
         }
     }
