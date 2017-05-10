@@ -9,7 +9,7 @@ namespace JwtAudience.Controllers
     {
         // GET api/values
         [HttpGet]
-        [Authorize]
+        [BearerAuthorize]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };

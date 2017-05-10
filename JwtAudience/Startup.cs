@@ -49,7 +49,6 @@ namespace JwtAudience
             _tokenOptions.Credentials = new SigningCredentials(_tokenOptions.Key, SecurityAlgorithms.RsaSha256Signature);
             services.AddSingleton(_tokenOptions);
 
-            services.AddSingleton<IAuthorizationHandler, ValidJtiHandler>();
 
             services.AddAuthorization(auth =>
             {
@@ -59,6 +58,7 @@ namespace JwtAudience
                     .AddRequirements(new ValidJtiRequirement())
                     .Build());
             });
+            services.AddSingleton<IAuthorizationHandler, ValidJtiHandler>();
             // Add framework services.
             services.AddMvc();
         }

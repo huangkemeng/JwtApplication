@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace JwtAudience
 {
@@ -20,6 +21,7 @@ namespace JwtAudience
         }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ValidJtiRequirement requirement)
         {
+            Console.WriteLine("validate jti");
             // 检查 Jti 是否存在
             var jti = context.User.FindFirst("jti")?.Value;
             if (jti == null)
