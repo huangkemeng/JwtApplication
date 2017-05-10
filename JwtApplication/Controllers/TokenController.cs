@@ -53,14 +53,12 @@ namespace JwtIssuer.Controllers
             return token;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/token/audience
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="user">用户登录信息</param>
+        /// <param name="audience">要访问的网站</param>
+        /// <returns></returns>
         [HttpPost("{audience}")]
         public IActionResult Post([FromBody]User user, string audience)
         {
@@ -72,23 +70,6 @@ namespace JwtIssuer.Controllers
                 return Json(new { Error = "用户名或密码错误" });
             }
             return Json(new { Token = CreateToken(result, expire, audience) });
-        }
-
-        // PUT api/values/5
-        [HttpPut("{audience}")]
-        [Authorize]
-        public void Put(string audience)
-        {
-        }
-
-        // DELETE api/values/5
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

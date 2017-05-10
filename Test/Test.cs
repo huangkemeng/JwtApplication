@@ -20,6 +20,10 @@ namespace Test
             Password = "pwd"
         }), Encoding.UTF8, "application/json");
 
+        /// <summary>
+        /// 先申请 token，然后使用这个 token 获取数据
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task SuccessTest()
         {
@@ -31,27 +35,87 @@ namespace Test
 
             HttpRequestMessage testReq = new HttpRequestMessage(HttpMethod.Get, _audienceUrl + "values")
             {
-                Headers = {Authorization = new AuthenticationHeaderValue("Bearer", token.token)}
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", token.token) }
             };
             var testResult = await client.SendAsync(testReq);
             Assert.True(testResult.StatusCode == HttpStatusCode.OK);
         }
 
+        /// <summary>
+        /// 申请一个 audience 不匹配的 token，然后尝试获取数据失败
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task WrongAudienceTest()
         {
             HttpClient client = new HttpClient();
             var response = await client.PostAsync(_issuerUrl + "token/Test", _loginContent);
             var json = await response.Content.ReadAsStringAsync();
-            var token = JsonConvert.DeserializeAnonymousType(json, new {token = ""});
-            Assert.True(string.IsNullOrEmpty(token.token)==false);
+            var token = JsonConvert.DeserializeAnonymousType(json, new { token = "" });
+            Assert.True(string.IsNullOrEmpty(token.token) == false);
 
             HttpRequestMessage testReq = new HttpRequestMessage(HttpMethod.Get, _audienceUrl + "values")
             {
-                Headers = {Authorization = new AuthenticationHeaderValue("Bearer", token.token)}
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", token.token) }
             };
             var testResult = await client.SendAsync(testReq);
             Assert.True(testResult.StatusCode == HttpStatusCode.Unauthorized);
+        }
+
+        /// <summary>
+        /// 先申请一个 token，然后使 token 失效
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task DisableTokenTest()
+        {
+            HttpClient client = new HttpClient();
+            var response = await client.PostAsync(_issuerUrl + "token/TestAudience", _loginContent);
+            var json = await response.Content.ReadAsStringAsync();
+            var token = JsonConvert.DeserializeAnonymousType(json, new { token = "" });
+            Assert.True(string.IsNullOrEmpty(token.token) == false);
+
+            HttpRequestMessage testReq = new HttpRequestMessage(HttpMethod.Delete, _audienceUrl + "token")
+            {
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", token.token) }
+            };
+            var testResult = await client.SendAsync(testReq);
+            Assert.Equal(HttpStatusCode.OK, testResult.StatusCode);
+
+            testReq = new HttpRequestMessage(HttpMethod.Get, _audienceUrl + "values")
+            {
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", token.token) }
+            };
+            testResult = await client.SendAsync(testReq);
+            Assert.True(testResult.StatusCode == HttpStatusCode.Forbidden);
+        }
+
+        /// <summary>
+        /// 先申请 token 然后尝试使同一个 token 失败两次
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task DisableTaskTwiceTest()
+        {
+            HttpClient client = new HttpClient();
+            var response = await client.PostAsync(_issuerUrl + "token/TestAudience", _loginContent);
+            var json = await response.Content.ReadAsStringAsync();
+            var token = JsonConvert.DeserializeAnonymousType(json, new { token = "" });
+            Assert.True(string.IsNullOrEmpty(token.token) == false);
+
+            HttpRequestMessage testReq = new HttpRequestMessage(HttpMethod.Delete, _audienceUrl + "token")
+            {
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", token.token) }
+            };
+            var testResult = await client.SendAsync(testReq);
+            Assert.Equal(HttpStatusCode.OK, testResult.StatusCode);
+
+            testReq = new HttpRequestMessage(HttpMethod.Delete, _audienceUrl + "token")
+            {
+                Headers = { Authorization = new AuthenticationHeaderValue("Bearer", token.token) }
+            };
+            testResult = await client.SendAsync(testReq);
+            Assert.Equal(HttpStatusCode.Forbidden, testResult.StatusCode);
         }
     }
 }

@@ -24,7 +24,10 @@ namespace JwtAudience.Controllers
         [HttpGet]
         public IActionResult Get() => Json(_dbContext.BlackRecords);
 
-        // DELETE api/values/5
+        /// <summary>
+        /// 使用户的 Token 失效
+        /// </summary>
+        /// <returns></returns>
         [BearerAuthorize]
         [HttpDelete]
         public IActionResult Delete()
