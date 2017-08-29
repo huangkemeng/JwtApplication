@@ -71,18 +71,6 @@ namespace JwtIssuer
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions
-            //{
-            //    TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        IssuerSigningKey = _tokenOptions.Key,
-            //        ValidIssuer = _tokenOptions.Issuer,
-            //        ValidateLifetime = true,
-            //        ValidateAudience = false
-            //    }
-               
-            //});
             app.UseMvc();
         }
     }

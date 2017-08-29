@@ -66,17 +66,5 @@ namespace JwtUtils
             var content = parameters.Map().To<RsaParameterStorage>();
             return JsonConvert.SerializeObject(content);
         }
-
-        //public static RSAParameters ReadParametersFromJson(string json)
-        //{
-        //    var storage = JsonConvert.DeserializeObject<RsaParameterStorage>(json);
-        //    return new RSAParameters
-        //    {
-        //        D = storage.D,
-        //        DP = storage.DP,
-        //        DQ = storage.DQ,
-
-        //    }
-        //}
     }
 }

@@ -80,20 +80,7 @@ namespace JwtAudience
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
             
-
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions
-            //{
-            //    TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        IssuerSigningKey = _tokenOptions.Key,
-            //        ValidAudience = _tokenOptions.Audience,
-            //        ValidIssuer = _tokenOptions.Issuer,
-            //        ValidateLifetime = true
-            //    }
-            //});
-
             app.UseMvc();
         }
     }
