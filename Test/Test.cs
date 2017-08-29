@@ -14,14 +14,14 @@ namespace Test
     {
         private readonly string _issuerUrl = "http://localhost:54385/api/";
         private readonly string _audienceUrl = "http://localhost:54539/api/";
-        private HttpContent _loginContent = new StringContent(JsonConvert.SerializeObject(new
+        private readonly HttpContent _loginContent = new StringContent(JsonConvert.SerializeObject(new
         {
             Username = "zeeko",
             Password = "pwd"
         }), Encoding.UTF8, "application/json");
 
         /// <summary>
-        /// ÏÈÉêÇë token£¬È»ºóÊ¹ÓÃÕâ¸ö token »ñÈ¡Êı¾İ
+        /// å…ˆç”³è¯· tokenï¼Œç„¶åä½¿ç”¨è¿™ä¸ª token è·å–æ•°æ®
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -42,7 +42,7 @@ namespace Test
         }
 
         /// <summary>
-        /// ÉêÇëÒ»¸ö audience ²»Æ¥ÅäµÄ token£¬È»ºó³¢ÊÔ»ñÈ¡Êı¾İÊ§°Ü
+        /// ç”³è¯·ä¸€ä¸ª audience ä¸åŒ¹é…çš„ tokenï¼Œç„¶åå°è¯•è·å–æ•°æ®å¤±è´¥
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -63,7 +63,7 @@ namespace Test
         }
 
         /// <summary>
-        /// ÏÈÉêÇëÒ»¸ö token£¬È»ºóÊ¹ token Ê§Ğ§
+        /// å…ˆç”³è¯·ä¸€ä¸ª tokenï¼Œç„¶åä½¿ token å¤±æ•ˆ
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -91,7 +91,7 @@ namespace Test
         }
 
         /// <summary>
-        /// ÏÈÉêÇë token È»ºó³¢ÊÔÊ¹Í¬Ò»¸ö token Ê§°ÜÁ½´Î
+        /// å…ˆç”³è¯· token ç„¶åå°è¯•ä½¿åŒä¸€ä¸ª token å¤±è´¥ä¸¤æ¬¡
         /// </summary>
         /// <returns></returns>
         [Fact]

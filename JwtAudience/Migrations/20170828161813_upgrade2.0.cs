@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace JwtAudience.Migrations
 {
-    public partial class init : Migration
+    public partial class upgrade20 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,8 +12,8 @@ namespace JwtAudience.Migrations
                 name: "BlackRecords",
                 columns: table => new
                 {
-                    Jti = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: true)
+                    Jti = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

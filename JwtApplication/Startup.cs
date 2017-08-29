@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using JwtUtils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -37,9 +37,9 @@ namespace JwtIssuer
                 builder.UseSqlite("Filename=./jwt.db");
             });
             string keyDir = PlatformServices.Default.Application.ApplicationBasePath;
-            if (RSAUtils.TryGetKeyParameters(keyDir, true, out RSAParameters keyParams) == false)
+            if (RsaUtils.TryGetKeyParameters(keyDir, true, out RSAParameters keyParams) == false)
             {
-                keyParams = RSAUtils.GenerateAndSaveKey(keyDir);
+                keyParams = RsaUtils.GenerateAndSaveKey(keyDir);
             }
             _tokenOptions.Key = new RsaSecurityKey(keyParams);
             _tokenOptions.Issuer = "TestIssuer";
@@ -52,6 +52,17 @@ namespace JwtIssuer
                     .RequireAuthenticatedUser()
                     .Build());
             });
+
+            services.AddAuthentication().AddJwtBearer(jwtOptions =>
+            {
+                jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = _tokenOptions.Key,
+                    ValidAudience = _tokenOptions.Audience,
+                    ValidIssuer = _tokenOptions.Issuer,
+                    ValidateLifetime = true
+                };
+            });
             services.AddMvc();
         }
 
@@ -61,17 +72,17 @@ namespace JwtIssuer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
-            {
-                TokenValidationParameters = new TokenValidationParameters
-                {
-                    IssuerSigningKey = _tokenOptions.Key,
-                    ValidIssuer = _tokenOptions.Issuer,
-                    ValidateLifetime = true,
-                    ValidateAudience = false
-                }
+            //app.UseJwtBearerAuthentication(new JwtBearerOptions
+            //{
+            //    TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        IssuerSigningKey = _tokenOptions.Key,
+            //        ValidIssuer = _tokenOptions.Issuer,
+            //        ValidateLifetime = true,
+            //        ValidateAudience = false
+            //    }
                
-            });
+            //});
             app.UseMvc();
         }
     }
